@@ -40,149 +40,117 @@ Blaze is the default frontend framework that comes with Meteor. It is a Meteor-o
 
 ## Minimongo
 
-- Although real-world React apps require developer tools to compile and build the app, the React docs show us a way to do the necessary processing right in the browser.
+`minimongo` is reimplementation of (almost) the entire MongoDB API, against an in-memory JavaScript database. It is like a MongoDB emulator that runs inside your web browser. You can insert data into it and search, sort, and update that data.
 
-- Setting up the playground requires:
-	1. Loading several scripts into our _index.html_
-	2. Loading our code into script tags and setting the type like this:<br>`<script type="text/babel" src="js/app.js"></script>`<br>- OR -<br>You can also play with code inline between script tags like this:<br>`<script type="text/babel">`<br>`  // your code in here`<br>`</script>`
-
-- Let's create a `react-tutorial` directory and an _index.html_ inside of it.
-
-<!--- <span style="text-decoration:line-through">`cd` into `react-tutorial` and copy/paste the setup code from the [Getting Started](https://facebook.github.io/react/docs/tutorial.html#getting-started) section into _index.html_.</span>
--->
-- Go to [this page](https://facebook.github.io/react/downloads/single-file-example.html), view the source (View -> Developer -> View Source), copy the HTML and paste it into your _index.html_.
-
-- We are going to put our code in a file and include it like this `<script type="text/babel" src="js/app.js">` - this way we will have syntax highlighting. **Create** the `js` directory and **touch** an `app.js` file inside of it.
-
-- Our page will need to be served up by a server, so spin up your favorite server (I'll use `http-server`).
-
-- Lastly, we will be using a special syntax known as JSX to describe the views in our components.  Let's make Atom aware of this syntax by installing the `react` package.
+Minimongo implements the following features, mirroring the MongoDB features:
+* Selectors
+* Modifiers
+* Fields projections
+* Querying with sort and limit
+* ObjectID generation
+* Geo-positional operator $near with GeoJSON parsing
+Internally, all documents are mapped in a single JS object from `_id` to the document.
 
 ## Hot Code Push
 
-Here is the [link to the new tutorial](https://facebook.github.io/react/tutorial/tutorial.html). Your favorite, another Tic-Tac-Toe game! Follow along with me and we'll work through the tutorial together.
+- When you make a change in the database, that change propagates through a persistent client-server connection and triggers an automatic update of the user interface, with no “glue” code necessary.
 
-You can do the tutorial directly in CodePen if you want, but I suggest that you copy the starter code from each file into your own files. This will allow you to use the Chrome dev tools later.
+- Blaze is the top of that stack — the front-end rendering engine that lets you define what your page should look like via HTML-like templates and then hook up data from Minimongo, Meteor’s front-end data store.
 
-<!--#### The tutorial below has been replaced!
+## Publications
 
-- Let's get a taste of writing some React by going through some of the steps of React's excellent online tutorial.
+In a traditional, HTTP-based web application, the client and server communicate in a “request-response” fashion. Typically the client makes RESTful HTTP requests to the server and receives HTML or JSON data in response, and there’s no way for the server to “push” data to the client when changes happen at the backend.
 
-- Along the way, we'll get some practice converting ES5 `React.createClass` code into ES2015 classes.
+Meteor is built from the ground up on the Distributed Data Protocol (DDP) to allow data transfer in both directions. Building a Meteor app doesn’t require you to set up REST endpoints to serialize and send data. Instead you create publication endpoints that can push data from server to client.
 
-- We'll follow the tutorial until we get to step `// tutorial6.js` (_Adding Markdown_).
+## Subscriptions
 
-- Let's skip `// tutorial6.js` & `// tutorial7.js`.
+We need a way for clients to specify which subset of that data they need, and that’s exactly where subscriptions come in.
+Any data you subscribe to will be mirrored on the client thanks to Minimongo, Meteor’s client-side implementation of MongoDB.
 
-- Continue the tutorial by completing `// tutorial8.js` through `// tutorial10.js`.
+You can think of a subscription as a pipe that connects a subset of the “real” collection with the client’s version, and constantly keeps it up to date with the latest information on the server.
 
-- Finally, time permitting, let's end the tutorial by completing `// tutorial15.js` through `// tutorial19.js` where we see how to work with forms to add a new comment.  However, there are a couple of caveats here due to the fact we have defined our components as ES2015 classes:
-	- The `getInitialState` method you will see applies only to components created with `createClass`. Components defined as classes set their initial state in a `constructor` method.
-	- `createClass` automatically binds methods to the instance of the component (this). However, with classes, we will have to use the `bind` method to accomplish the same thing and I will show you two different ways of using it. I can also show you how to use an arrow function in certain cases.-->
+// on the server
+Meteor.publish('posts', function(author) {
+  return Posts.find({flagged: false, author: author});
+});
+
+// on the client
+Meteor.subscribe('posts', 'bob-smith');
 
 ## Todo App Walkthrough
 
-#### Everything is JavaScript
+#### Getting Started
 
-- Unlike other frameworks like AngularJS, Ember, etc., React does not use HTML to define any part of the UI.
+- This tutorial can be found on Meteor.com: (https://www.meteor.com/tutorials/blaze/creating-an-app)
 
-- When coding a React app, we only use JavaScript.
+#### <head>, <body>, <template>
 
-- If everything is JavaScript, how do we define a component's HTML? Glad you asked...
+- Meteor breaks down HTML into three main components: head, body, and templates.
 
-#### JSX
+- In the example code, you will notice that there is no HTML boilerplate, no script tags, and no link tags. This is how Meteor is designed (a .meteor folder is generated when creating a Meteor app—it contains the code that allows this to be possible).
 
-- The React library has a `React.createElement` method used to create DOM elements.
-
-- However, there's a more readable, more elegant and more fun way to code the UI than using pure JS - JSX.
-
-- JSX (JavaScript XML) looks like HTML, complete with attributes.  Let's see how a component might render a `<div>` styled using Bootstrap's _jumbotron_ class:
-
-	```js
-	... components have a render method - other code omitted
-	  render() {
-	    return <div className="jumbotron">Best Application EVER</div>;
-	  }
-	```
-	Note that JSX uses `className` instead of `class`.  This is necessary because `class` is a keyword in JavaScript.  Instead, JSX uses the same JS property names found on DOM elements.
-
-- JSX must be compiled into pure JavaScript before our browser can understand it.  This pre-processing is one of the reasons why developing React apps require tools that need to be installed and configured...
-
-#### Tooling
-
-- Real-world React apps require "building".
-
-- A build process must be run on the developers workstation for the purpose of:
-
-	- Compiling JSX into native JavaScript
-	- Transforming and processing other assets as necessary
-	- Loading of JavaScript modules
-	- Packaging JS files and dependencies into a single JS `bundle.js` file
-
-- There are several build tools available.  However, the one that has gained the most traction of late for developing React apps is _Webpack_.
-
-- Regardless of the tooling, configuring them for best results is not trivial.
-
-- Luckily, the React team has released, `create-react-app`, a CLI that:
-	- Generates a minimal React app
-	- Sets up the dev environment for:
-		- Live compiling & page refresh
-		- Testing
-		- Building for production
-
-#### Components
-
-- User interfaces in React are composed of components.
-
-- Each component is defined by a single JS `class`.  For example, a component used to render a _comment_ in an app might be defined with a class named **Comment**:
-
-	```js
-	class Comment extends React.Component {
-	  render() {
-	    return (
-	      <div>Comment: {this.props.comment}</div>
-	    );
-	  }
-	}
-	```
-
-- Prior to ES2015, components were being defined in ES5 using the `React.createClass` method.
-
-- Components can only return a single, outer DOM element.  However, that single DOM element may have child DOM elements nested within it.
-
-- Most React apps will have a single main root component rendered inside of an element on the _index.html_ page. The React app would be rendered with the ReactDOM library like this:
-
-	```js
-	ReactDOM.render(
-	  <App />,
-	  document.getElementById('react-app')
-	);
-	```
-
-	This assumes that you have an element in your body like:
+- Meteor uses templates to modularize code. An example is in task.html:
 
 	```html
-	<body>
-		<main id="react-app"></main>
-	</body>
-	```
+	<template name="task">
+		<li class="{{#if checked}}checked{{/if}}">
+			<button class="delete">&times;</button>
 
-	and a main component, named `App`, that might be something like this:
+			<input type="checkbox" checked="{{checked}}" class="toggle-checked" />
+
+			<span class="text">{{text}}</span>
+		</li>
+	</template>
+	```
+- This template contains a class of task that is called in body.html:
+
+	```html
+	<div class="active">
+		<ul>
+			<h3 class="active-header">Active Todos</h3>
+			{{#each tasks}}
+			{{#unless checked}}
+			{{> task}}
+			{{/unless}}
+			{{/each}}
+		</ul>
+	</div>
+	```
+- The `>` is used to defined a template the is being called.
+- Templates are referenced in JavaScript like:
 
 	```js
-	class App extends React.Component {
-	  render() {
-	    return (
-	      <div>
-	        <MenuBar />
-	        <GameBoard />
-	        <Footer />
-	      </div>
-	    );
-	  }
-	}
+	import { Template } from 'meteor/templating';
+
+	import { Tasks } from '../api/tasks.js';
+
+	import './task.html';
+
+	Template.task.events({
+	  'click .toggle-checked'() {
+	    // Set the checked property to the opposite of its current value
+	    Tasks.update(this._id, {
+	      $set: { checked: !this.checked },
+	    });
+	  },
+	  'click .delete'() {
+	    Tasks.remove(this._id);
+	  },
+	});
 	```
 
-- It is a better practice to have numerous small components
+#### Meteor Spacebars
 
-- Components will often render child components.  For example:
+- Spacebars are similar to AngularJS's curly brackets, but with its own unique syntax:
+
+	```html
+	<ul>
+		<h3 class="active-header">Active Todos</h3>
+		{{#each tasks}}
+		{{#unless checked}}
+		{{> task}}
+		{{/unless}}
+		{{/each}}
+	</ul>
+	```
