@@ -1,0 +1,33 @@
+<body>
+  <div class="container">
+    <header>
+      <h1>Todo List</h1>
+      <form class="new-task">
+        <input type="text" name="text" placeholder="Type to add new tasks"/>
+      </form>
+    </header>
+
+    <div class="active">
+      <ul>
+        <h3 class="active-header">Active Todos</h3>
+        {{#each tasks}}
+        {{#unless checked}}
+        {{> task}}
+        {{/unless}}
+        {{/each}}
+      </ul>
+    </div>
+
+    <div class="completed">
+      <ul>
+        <h3 class="completed-header">Completed Todos</h3>
+        {{#each tasks}}
+        {{#if checked}}
+        {{> task}}
+        {{/if}}
+        {{/each}}
+      </ul>
+    </div>
+
+  </div>
+</body>
