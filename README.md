@@ -84,7 +84,7 @@ Meteor.subscribe('posts', 'bob-smith');
 
 - This tutorial can be found on Meteor.com: (https://www.meteor.com/tutorials/blaze/creating-an-app)
 
-#### <head>, <body>, <template>
+#### Head, Body, Template
 
 - Meteor breaks down HTML into three main components: head, body, and templates.
 
