@@ -70,11 +70,13 @@ Any data you subscribe to will be mirrored on the client thanks to Minimongo, Me
 
 You can think of a subscription as a pipe that connects a subset of the “real” collection with the client’s version, and constantly keeps it up to date with the latest information on the server.
 
-	```js
+	```
+	// on the server
 	Meteor.publish('posts', function(author) {
 	  return Posts.find({flagged: false, author: author});
 	});
 
+	// on the client
 	Meteor.subscribe('posts', 'bob-smith');
 	```
 
