@@ -79,7 +79,6 @@ You can think of a subscription as a pipe that connects a subset of the â€œrealâ
 	// on the client
 	Meteor.subscribe('posts', 'bob-smith');
 	```
-
 ## Todo App Walkthrough
 
 #### Getting Started
